@@ -38,19 +38,23 @@ components/               ← UI만 담당
 ### 핵심 패턴
 
 **API 레이어 (`src/api/notes.ts`)**
+
 - `createNote`와 `updateNote`가 `createdAt` / `updatedAt` 타임스탬프를 자동 주입
 - 모든 함수는 `!res.ok` 시 Error를 throw — 컨텍스트에서 catch
 
 **컨텍스트 (`src/context/NotesContext.tsx`)**
+
 - `NotesProvider`가 앱 전체를 감싸고 `notes`, `loading`, `error` 상태를 관리
 - CRUD 후 API 응답값으로 로컬 state를 즉시 갱신 (서버 재요청 없음)
 - `useNotes()` 훅은 Provider 외부에서 호출 시 에러를 throw
 
 **`App.tsx` 상태 관리**
+
 - `selectedNoteId` + `isCreating` 두 플래그로 NoteEditor 모드(보기 / 편집 / 신규) 결정
 - 두 플래그는 상호 배타적으로 관리 (`handleSelectNote`는 isCreating을 false로 리셋)
 
 **NoteEditor**
+
 - `isCreating=true` → 새 노트 작성 모드, `selectedNoteId` 있음 → 편집 모드
 - 둘 다 없으면 빈 안내 화면 렌더링
 
@@ -81,14 +85,14 @@ components/               ← UI만 담당
 
 ### 네이밍
 
-| 구분 | 패턴 | 예시 |
-|------|------|------|
-| 컴포넌트 / 타입 | PascalCase | `NoteList`, `NoteItemProps` |
-| 이벤트 prop | `on` + 동사 | `onSelect`, `onDelete`, `onNewNote` |
-| 이벤트 핸들러 구현 | `handle` + 동사 | `handleSave`, `handleSelectNote` |
-| 불리언 상태 | `is` + 형용사 | `isCreating`, `isSelected` |
-| API 함수 | 동사 + 명사 | `fetchNotes`, `createNote`, `updateNote`, `deleteNote` |
-| 커스텀 훅 | `use` + 명사 | `useNotes` |
+| 구분               | 패턴            | 예시                                                   |
+| ------------------ | --------------- | ------------------------------------------------------ |
+| 컴포넌트 / 타입    | PascalCase      | `NoteList`, `NoteItemProps`                            |
+| 이벤트 prop        | `on` + 동사     | `onSelect`, `onDelete`, `onNewNote`                    |
+| 이벤트 핸들러 구현 | `handle` + 동사 | `handleSave`, `handleSelectNote`                       |
+| 불리언 상태        | `is` + 형용사   | `isCreating`, `isSelected`                             |
+| API 함수           | 동사 + 명사     | `fetchNotes`, `createNote`, `updateNote`, `deleteNote` |
+| 커스텀 훅          | `use` + 명사    | `useNotes`                                             |
 
 ## 에러 처리 규칙
 
@@ -106,6 +110,37 @@ components/               ← UI만 담당
 - Vitest + jsdom 환경, `@testing-library/react` 사용
 - `src/test-setup.ts`에서 `@testing-library/jest-dom` 매처 설정
 - 테스트 파일은 컴포넌트/훅 옆에 위치시키는 것이 관례
+
+## 커밋 규칙
+
+### 메시지 형식
+
+```
+type: 제목 (필수)
+
+본문 첫 번째 줄 (필수)
+본문 두 번째 줄 (필수)
+```
+
+### 허용 type
+
+| type       | 용도                        |
+| ---------- | --------------------------- |
+| `feat`     | 새 기능                     |
+| `fix`      | 버그 수정                   |
+| `docs`     | 문서                        |
+| `style`    | 포맷·공백 등 로직 무관 변경 |
+| `refactor` | 리팩토링                    |
+| `test`     | 테스트                      |
+| `chore`    | 빌드·설정                   |
+| `init`     | 초기 세팅                   |
+
+### Git 훅 (husky)
+
+- **pre-commit**: staged `.ts/.tsx` → ESLint --fix + Prettier, `.css/.json/.md` → Prettier
+- **commit-msg**: 형식 위반 또는 제목 누락, 본문 2줄 미만이면 커밋 차단
+
+설정 파일: `commitlint.config.js`, `.husky/pre-commit`, `.husky/commit-msg`
 
 ## 도구 설정
 
