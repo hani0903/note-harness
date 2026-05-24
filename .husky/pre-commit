@@ -1,1 +1,6 @@
+echo "🚀 Pre-commit checks started..."
+echo "🔍 Running lint-staged..."
+
 npx lint-staged
+
+echo "✅ Pre-commit checks passed!"
