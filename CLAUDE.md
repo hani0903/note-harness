@@ -148,3 +148,14 @@ type: 제목 (필수)
 - **ESLint**: Flat config (`eslint.config.js`), react-hooks + react-refresh 플러그인
 - **Prettier**: `.prettierrc` 참조
 - **데이터 저장소**: `db.json` (JSON Server가 자동 관리, 직접 수정 가능)
+
+## 디자인 시스템
+
+UI·CSS·컴포넌트 작업 시 반드시 참조한다. `/design-check` 커맨드로 작업 결과를 검토한다.
+
+- 진입점: `docs/design-system/README.md`
+- 컬러 토큰: `docs/design-system/01-tokens-color.md`
+- 컴포넌트: `docs/design-system/05-components/`
+- 금지 규칙: `docs/design-system/dont.md`
+
+**핵심**: 선(border) 대신 배경 색 시프트, 그림자 대신 Tonal Layering.
