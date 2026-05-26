@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notes App — Architecture</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f13;
+      color: #e2e2e8;
+      min-height: 100vh;
+      padding: 48px 24px 80px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    header p {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #1e1e2e;
+      border: 1px solid #333;
+      color: #a78bfa;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #16161f;
+      border: 1px solid #2a2a38;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 20px 28px 16px;
+      border-bottom: 1px solid #2a2a38;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .icon-blue   { background: #1d3461; }
+    .icon-purple { background: #2d1b69; }
+    .icon-green  { background: #0f2d1f; }
+
+    .card-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .card-header p {
+      font-size: 0.78rem;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .card-body {
+      padding: 32px 24px;
+      overflow-x: auto;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 16px 28px 20px;
+      border-top: 1px solid #2a2a38;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: #888;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .card.wide { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📝 Notes App — Architecture</h1>
+    <p>React 19 · TypeScript · Vite · JSON Server</p>
+    <span class="badge">Mermaid Diagram</span>
+  </header>
+
+  <div class="grid">
+
+    <!-- Diagram 1: Component Dependency Tree -->
+    <div class="card wide">
+      <div class="card-header">
+        <div class="card-icon icon-blue">🧩</div>
+        <div>
+          <h2>컴포넌트 의존성 그래프</h2>
+          <p>각 모듈이 어떤 모듈을 import / 사용하는지</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="mermaid">
+graph TD
+    main["🚀 main.tsx"]
+    App["📦 App.tsx"]
+    Provider["🗄️ NotesProvider\ncontext/NotesContext"]
+    Layout["🖼️ Layout\ncomponents/Layout"]
+    NoteList["📋 NoteList\ncomponents/NoteList"]
+    NoteEditor["✏️ NoteEditor\ncomponents/NoteEditor"]
+    NoteItem["🗒️ NoteItem\ncomponents/NoteItem"]
+    useNotes["🪝 useNotes()"]
+    API["🌐 api/notes.ts"]
+    Server["🗃️ JSON Server\nlocalhost:3001"]
+    NoteType["📐 types/note.ts"]
+
+    main -->|renders| App
+    App -->|wraps| Provider
+    App -->|renders| Layout
+    App -->|sidebar slot| NoteList
+    App -->|main slot| NoteEditor
+
+    Layout -->|slot: sidebar| NoteList
+    Layout -->|slot: main| NoteEditor
+
+    NoteList -->|uses| useNotes
+    NoteList -->|renders each| NoteItem
+    NoteEditor -->|uses| useNotes
+    useNotes -->|reads from| Provider
+
+    Provider -->|calls| API
+    API -->|GET POST PATCH DELETE| Server
+
+    NoteItem -.->|type| NoteType
+    API -.->|type| NoteType
+    Provider -.->|type| NoteType
+
+    classDef entry  fill:#1d3461,stroke:#3b6bbf,color:#c5d8f8
+    classDef comp   fill:#1a2a1a,stroke:#3a7a3a,color:#a8d8a8
+    classDef ctx    fill:#2d1b69,stroke:#7c3aed,color:#c4b5fd
+    classDef api    fill:#2d1a0e,stroke:#c2410c,color:#fed7aa
+    classDef server fill:#1a1a2d,stroke:#4f46e5,color:#a5b4fc
+    classDef type   fill:#1e1e1e,stroke:#555,color:#999
+
+    class main entry
+    class App,Layout,NoteList,NoteEditor,NoteItem comp
+    class Provider,useNotes ctx
+    class API api
+    class Server server
+    class NoteType type
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#3b6bbf"></div> Entry point</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3a7a3a"></div> Component</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7c3aed"></div> Context / Hook</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c2410c"></div> API layer</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4f46e5"></div> External server</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#555"></div> Type (dashed)</div>
+      </div>
+    </div>
+
+    <!-- Diagram 2: State Flow -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-purple">🔄</div>
+        <div>
+          <h2>상태 흐름도</h2>
+          <p>상태가 어디서 관리되고 어디로 흐르는지</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="mermaid">
+flowchart TD
+    subgraph AppState["App.tsx — UI State"]
+        SI["selectedNoteId: string | null"]
+        IC["isCreating: boolean"]
+    end
+
+    subgraph CTX["NotesContext — Server State"]
+        NS["notes: Note[]"]
+        LD["loading: boolean"]
+        ER["error: string | null"]
+    end
+
+    subgraph EDT["NoteEditor — Local State"]
+        TI["title: string"]
+        CO["content: string"]
+        SV["saving: boolean"]
+    end
+
+    AppState -->|"selectedNoteId, isCreating"| EDT
+    AppState -->|"selectedNoteId"| NoteList
+
+    CTX -->|"notes, loading, error, deleteNote"| NoteList
+    CTX -->|"notes, createNote, updateNote"| EDT
+
+    EDT -->|"createNote(title, content)"| CTX
+    EDT -->|"updateNote(id, updates)"| CTX
+    NoteList -->|"deleteNote(id)"| CTX
+
+    CTX <-->|HTTP| APILayer["api/notes.ts"]
+    APILayer <-->|"GET · POST · PATCH · DELETE"| JSONServer["JSON Server :3001"]
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagram 3: CRUD Sequence -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-green">⚡</div>
+        <div>
+          <h2>CRUD 시퀀스</h2>
+          <p>노트 생성·삭제 시 레이어별 호출 순서</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="mermaid">
+sequenceDiagram
+    actor User
+    participant NE as NoteEditor
+    participant CTX as NotesContext
+    participant API as api/notes.ts
+    participant DB as JSON Server
+
+    Note over User,DB: 노트 생성
+    User->>NE: 제목·내용 입력 후 저장
+    NE->>CTX: createNote(title, content)
+    CTX->>API: createNote({title, content})
+    API->>DB: POST /notes + timestamps
+    DB-->>API: 201 Note 객체 반환
+    API-->>CTX: Note
+    CTX->>CTX: setNotes([...prev, note])
+    NE->>NE: onDone() 호출
+
+    Note over User,DB: 노트 삭제
+    User->>NL: 삭제 버튼 클릭
+    NL->>CTX: deleteNote(id)
+    CTX->>API: deleteNote(id)
+    API->>DB: DELETE /notes/:id
+    DB-->>API: 200 OK
+    CTX->>CTX: setNotes(filter)
+    participant NL as NoteList
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1d3461',
+        primaryTextColor: '#e2e2e8',
+        primaryBorderColor: '#3b6bbf',
+        lineColor: '#6b7280',
+        secondaryColor: '#16161f',
+        tertiaryColor: '#0f0f13',
+        background: '#0f0f13',
+        mainBkg: '#16161f',
+        nodeBorder: '#333',
+        clusterBkg: '#1a1a2a',
+        titleColor: '#e2e2e8',
+        edgeLabelBackground: '#1e1e2e',
+      },
+      flowchart: { curve: 'basis', padding: 20 },
+      sequence: { actorFontSize: 13, noteFontSize: 12, messageFontSize: 12 },
+    });
+  </script>
+</body>
+</html>
