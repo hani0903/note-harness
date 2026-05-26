@@ -5,7 +5,9 @@
 const fs = require('fs');
 
 let stdin = '';
-process.stdin.on('data', (chunk) => { stdin += chunk; });
+process.stdin.on('data', (chunk) => {
+  stdin += chunk;
+});
 process.stdin.on('end', () => {
   let data;
   try {
@@ -27,18 +29,37 @@ process.stdin.on('end', () => {
   }
   // CSS: `box-shadow:` / TSX inline style: `boxShadow:`
   if (/(box-shadow:|boxShadow:)/.test(content)) {
-    violations.push('box-shadow/boxShadow — Tonal Layering 사용 권장 (플로팅 요소 Ambient Shadow만 허용)');
+    violations.push(
+      'box-shadow/boxShadow — Tonal Layering 사용 권장 (플로팅 요소 Ambient Shadow만 허용)',
+    );
   }
   // 하드코딩 검정색 (#000, #000000)
   if (/#000000|#000[^0-9a-fA-F"']/.test(content)) {
     violations.push('#000/#000000 하드코딩 — 디자인 토큰 사용 (예: on_surface #2b3437)');
   }
 
+  // transition all 금지하기
+  if (/transition:\s*all/.test(content)) {
+    violations.push(
+      'transition: all 금지 — opacity/transform/background-color 등 명시적 transition 사용',
+    );
+  }
+
+  // z-index 하드 코딩 금지하기
+  if (/z-index:\s*(999|9999|[1-9]\d{2,})/.test(content)) {
+    violations.push('고정 z-index 사용 감지 — layer token 사용 권장 (예: z-modal, z-toast)');
+  }
+
+  // arbitrary color 감지
+  if (/\[#([0-9a-fA-F]{3,8})\]/.test(content)) {
+    violations.push('Tailwind arbitrary color 사용 감지 — theme token 사용 권장');
+  }
+
   if (violations.length > 0) {
     process.stderr.write(
       `\n🎨 Design System Check [${filePath}]\n` +
-      violations.map((v) => `  ⚠️  ${v}`).join('\n') +
-      '\n'
+        violations.map((v) => `  ⚠️  ${v}`).join('\n') +
+        '\n',
     );
   }
 });
