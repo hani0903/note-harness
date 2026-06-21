@@ -76,24 +76,24 @@ interface TagInputProps {
 
 ### 정상
 
-- [정상] useTagInput — should initialize tags with ["vue"] when called with initialTags ["vue"]
-- [정상] useTagInput — should append "react" to tags and reset inputValue to "" when addTag("react") is called
-- [정상] TagInput — should render "태그 입력 후 Enter" placeholder when tags is []
-- [정상] TagInput — should call onAddTag with "react" when Enter is pressed and inputValue is "react"
-- [정상] TagInput — should render "vue" and "react" chips when tags is ["vue", "react"]
-- [정상] NoteEditor — should render TagInput below the content textarea when the editor is open
-- [정상] NoteEditor — should restore "vue" and "typescript" chips when opening a note whose tags is ["vue", "typescript"]
-- [정상] NoteEditor — should pass tags ["react"] into createNote/updateNote payload when the save button is clicked
+- [x] [정상] useTagInput — should initialize tags with ["vue"] when called with initialTags ["vue"]
+- [x] [정상] useTagInput — should append "react" to tags and reset inputValue to "" when addTag("react") is called
+- [x] [정상] TagInput — should render "태그 입력 후 Enter" placeholder when tags is []
+- [x] [정상] TagInput — should call onAddTag with "react" when Enter is pressed and inputValue is "react"
+- [x] [정상] TagInput — should render "vue" and "react" chips when tags is ["vue", "react"]
+- [x] [정상] NoteEditor — should render TagInput below the content textarea when the editor is open
+- [x] [정상] NoteEditor — should restore "vue" and "typescript" chips when opening a note whose tags is ["vue", "typescript"]
+- [x] [정상] NoteEditor — should pass tags ["react"] into createNote/updateNote payload when the save button is clicked
 
 ### 경계
 
-- [경계] useTagInput — should initialize tags as [] when initialTags is undefined
-- [경계] TagInput — should render zero chips when tags is []
-- [경계] TagInput — should call onAddTag with "" when Enter is pressed and inputValue is "" (검증은 Issue 8 책임, 여기선 전달만 확인)
+- [x] [경계] useTagInput — should initialize tags as [] when initialTags is undefined
+- [x] [경계] TagInput — should render zero chips when tags is []
+- [x] [경계] TagInput — should call onAddTag with "" when Enter is pressed and inputValue is "" (검증은 Issue 8 책임, 여기선 전달만 확인)
 
 ### 예외
 
-- [예외] NoteEditor — should not call updateNote when another note is selected before saving
+- [x] [예외] NoteEditor — should not call updateNote when another note is selected before saving
 
 ## AC 커버리지
 
