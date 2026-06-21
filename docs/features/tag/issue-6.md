@@ -84,6 +84,7 @@ interface TagInputProps {
 - [x] [정상] NoteEditor — should render TagInput below the content textarea when the editor is open
 - [x] [정상] NoteEditor — should restore "vue" and "typescript" chips when opening a note whose tags is ["vue", "typescript"]
 - [x] [정상] NoteEditor — should pass tags ["react"] into createNote/updateNote payload when the save button is clicked
+- [x] [정상] NoteEditor — should pass tags ["vue", "react"] into updateNote payload when saving an existing note (AC-5 updateNote 경로 보강, ac-verifier 갭)
 
 ### 경계
 
@@ -94,15 +95,16 @@ interface TagInputProps {
 ### 예외
 
 - [x] [예외] NoteEditor — should not call updateNote when another note is selected before saving
+- [x] [예외] NoteEditor — should not call updateNote when a tag is added but then another note is selected before saving (AC-7 미저장 이탈 재현 보강, ac-verifier 갭)
 
 ## AC 커버리지
 
-| AC                                      | 커버하는 시나리오                                                                        |
-| --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| AC-1 (TagInput이 textarea 아래 표시)    | `[정상] NoteEditor — render TagInput below content textarea`                             |
-| AC-2 (placeholder)                      | `[정상] TagInput — placeholder when tags is []`                                          |
-| AC-3 (Enter → 칩 + input 초기화)        | `[정상] TagInput — onAddTag on Enter` + `[정상] useTagInput — append & reset inputValue` |
-| AC-4 (["vue"] + react → 두 칩)          | `[정상] TagInput — render two chips` + `[정상] useTagInput — append "react"`             |
-| AC-5 (저장 → payload tags)              | `[정상] NoteEditor — pass tags into createNote/updateNote payload`                       |
-| AC-6 (열면 저장된 태그 복원)            | `[정상] NoteEditor — restore chips`                                                      |
-| AC-7 (저장 전 이탈 → updateNote 미호출) | `[예외] NoteEditor — should not call updateNote`                                         |
+| AC                                      | 커버하는 시나리오                                                                                                                 |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| AC-1 (TagInput이 textarea 아래 표시)    | `[정상] NoteEditor — render TagInput below content textarea`                                                                      |
+| AC-2 (placeholder)                      | `[정상] TagInput — placeholder when tags is []`                                                                                   |
+| AC-3 (Enter → 칩 + input 초기화)        | `[정상] TagInput — onAddTag on Enter` + `[정상] useTagInput — append & reset inputValue`                                          |
+| AC-4 (["vue"] + react → 두 칩)          | `[정상] TagInput — render two chips` + `[정상] useTagInput — append "react"`                                                      |
+| AC-5 (저장 → payload tags)              | `[정상] NoteEditor — pass tags into createNote payload` + `[정상] NoteEditor — pass tags into updateNote payload (기존 노트)`     |
+| AC-6 (열면 저장된 태그 복원)            | `[정상] NoteEditor — restore chips`                                                                                               |
+| AC-7 (저장 전 이탈 → updateNote 미호출) | `[예외] NoteEditor — should not call updateNote (단순 전환)` + `[예외] NoteEditor — should not call updateNote (칩 추가 후 전환)` |

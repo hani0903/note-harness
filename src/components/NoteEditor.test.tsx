@@ -71,6 +71,21 @@ describe('NoteEditor', () => {
     expect(createNote).toHaveBeenCalledWith(expect.any(String), expect.any(String), ['react']);
   });
 
+  it('should pass tags ["vue", "react"] into updateNote payload when saving an existing note', async () => {
+    const user = userEvent.setup();
+    mockState.notes = [makeNote({ id: '1', tags: ['vue'] })];
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+
+    await user.type(screen.getByPlaceholderText('태그 입력 후 Enter'), 'react{Enter}');
+    await user.click(screen.getByRole('button', { name: '저장' }));
+
+    expect(updateNote).toHaveBeenCalledWith(
+      '1',
+      expect.objectContaining({ tags: ['vue', 'react'] }),
+    );
+  });
+
   it('should not call updateNote when another note is selected before saving', () => {
     mockState.notes = [
       makeNote({ id: '1', tags: ['vue'] }),
@@ -80,6 +95,23 @@ describe('NoteEditor', () => {
     const { rerender } = render(
       <NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />,
     );
+    rerender(<NoteEditor selectedNoteId="2" isCreating={false} onDone={vi.fn()} />);
+
+    expect(updateNote).not.toHaveBeenCalled();
+  });
+
+  it('should not call updateNote when a tag is added but then another note is selected before saving', async () => {
+    const user = userEvent.setup();
+    mockState.notes = [
+      makeNote({ id: '1', tags: ['vue'] }),
+      makeNote({ id: '2', tags: ['react'] }),
+    ];
+
+    const { rerender } = render(
+      <NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />,
+    );
+
+    await user.type(screen.getByPlaceholderText('태그 입력 후 Enter'), 'typescript{Enter}');
     rerender(<NoteEditor selectedNoteId="2" isCreating={false} onDone={vi.fn()} />);
 
     expect(updateNote).not.toHaveBeenCalled();
