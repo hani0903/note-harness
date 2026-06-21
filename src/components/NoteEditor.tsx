@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNotes } from '../context/NotesContext';
+import { useTagInput } from '../hooks/useTagInput';
+import { TagInput } from './TagInput';
 
 interface NoteEditorProps {
   selectedNoteId: string | null;
@@ -11,36 +13,41 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
   const { notes, createNote, updateNote } = useNotes();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId);
+  const { tags, inputValue, setInputValue, setTags, addTag } = useTagInput(
+    selectedNote?.tags ?? [],
+  );
 
   // 선택된 노트가 바뀔 때 폼 동기화
   useEffect(() => {
     if (selectedNote) {
       setTitle(selectedNote.title);
       setContent(selectedNote.content);
+      setTags(selectedNote.tags ?? []);
     } else if (isCreating) {
       setTitle('');
       setContent('');
+      setTags([]);
     }
   }, [selectedNoteId, isCreating]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async () => {
     if (!title.trim()) return;
 
-    setSaving(true);
+    setIsSaving(true);
     try {
       if (isCreating) {
-        await createNote(title, content);
+        await createNote(title, content, tags);
       } else if (selectedNoteId) {
-        await updateNote(selectedNoteId, { title, content });
+        await updateNote(selectedNoteId, { title, content, tags });
       }
       onDone();
     } catch (e) {
       console.error(e);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
 
@@ -50,9 +57,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
       <div className="flex items-center justify-center h-full">
         <div className="text-center space-y-3">
           <p className="text-5xl">📝</p>
-          <p className="text-muted-foreground text-sm">
-            노트를 선택하거나 새 노트를 만드세요
-          </p>
+          <p className="text-muted-foreground text-sm">노트를 선택하거나 새 노트를 만드세요</p>
         </div>
       </div>
     );
@@ -86,14 +91,24 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
         className="w-full text-base text-foreground/70 bg-transparent border-none outline-none resize-none placeholder:text-muted-foreground/50 leading-relaxed"
       />
 
+      {/* 태그 입력 */}
+      <div className="mt-4">
+        <TagInput
+          tags={tags}
+          inputValue={inputValue}
+          onInputChange={setInputValue}
+          onAddTag={addTag}
+        />
+      </div>
+
       {/* 버튼 영역 */}
       <div className="flex gap-3 mt-6 pt-4 border-t border-border">
         <button
           onClick={handleSave}
-          disabled={saving}
+          disabled={isSaving}
           className="bg-foreground text-card px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-75 transition-opacity disabled:opacity-40 cursor-pointer"
         >
-          {saving ? '저장 중...' : '저장'}
+          {isSaving ? '저장 중...' : '저장'}
         </button>
         <button
           onClick={onDone}
