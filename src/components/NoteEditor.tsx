@@ -13,7 +13,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
   const { notes, createNote, updateNote } = useNotes();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId);
   const { tags, inputValue, setInputValue, setTags, addTag } = useTagInput(
@@ -36,7 +36,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
   const handleSave = async () => {
     if (!title.trim()) return;
 
-    setSaving(true);
+    setIsSaving(true);
     try {
       if (isCreating) {
         await createNote(title, content, tags);
@@ -47,7 +47,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
     } catch (e) {
       console.error(e);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
 
@@ -105,10 +105,10 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
       <div className="flex gap-3 mt-6 pt-4 border-t border-border">
         <button
           onClick={handleSave}
-          disabled={saving}
+          disabled={isSaving}
           className="bg-foreground text-card px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-75 transition-opacity disabled:opacity-40 cursor-pointer"
         >
-          {saving ? '저장 중...' : '저장'}
+          {isSaving ? '저장 중...' : '저장'}
         </button>
         <button
           onClick={onDone}
